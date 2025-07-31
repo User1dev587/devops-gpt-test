@@ -13,10 +13,10 @@ spec:
         app: nginx
     spec:
       imagePullSecrets:
-      - name: azure-secret
+      - name: acr-secret
       containers:
       - name: nginx
-        image: myregistry.azurecr.io/nginx-static:latest
+        image: terratamldacr.azurecr.io/nginx-static:latest
         ports:
         - containerPort: 80
         readinessProbe:

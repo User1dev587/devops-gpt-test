@@ -5,12 +5,12 @@ trigger:
 
 variables:
   imageName: 'nginx-static'
-  registry: 'myregistry.azurecr.io'
+  registry: 'terratamldacr.azurecr.io'
   tag: 'latest'
-  dockerRegistryServiceConnection: 'docker-registry-connection'
+  dockerRegistryServiceConnection: 'acr-connection'
   azureServiceConnection: 'azure-service-connection'
-  aksResourceGroup: 'myResourceGroup'
-  aksClusterName: 'myAKSCluster'
+  aksResourceGroup: 'terraform-aks'
+  aksClusterName: 'terra-aks'
 
 stages:
 - stage: Build
@@ -58,7 +58,6 @@ stages:
           --docker-server=$(registry) \
           --docker-username=$(ACR_USERNAME) \
           --docker-password=$(ACR_PASSWORD) \
-          --docker-email=$(ACR_EMAIL) \
           --namespace default --dry-run=client -o yaml | kubectl apply -f -
       displayName: 'Create Docker Registry Secret'
     - script: |
