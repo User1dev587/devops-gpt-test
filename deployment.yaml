@@ -14,10 +14,10 @@ spec:
     spec:
       imagePullSecrets:
       - name: acr-secret
-      imagePullPolicy: Always
       containers:
       - name: nginx
         image: terratamldacr.azurecr.io/nginx-static:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
         readinessProbe:
