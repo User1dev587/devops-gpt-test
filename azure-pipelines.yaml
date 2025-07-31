@@ -5,7 +5,7 @@ trigger:
 
 variables:
   azureSubscription: 'azure-service-connection'
-  acrServiceConnection: 'acr-service-connection'
+  acrServiceConnection: 'acr-connection'
   resourceGroup: 'terraform-aks'
   aksClusterName: 'terra-aks'
   acrName: 'terratamldacr'
@@ -53,8 +53,6 @@ stages:
   - job: DeployToAKS
     pool:
       vmImage: 'ubuntu-latest'
-    variables:
-      - group: 'ACR-Credentials'  # Variable group containing ACR_PASSWORD secret
     steps:
     - task: AzureCLI@2
       displayName: 'Azure Login'
