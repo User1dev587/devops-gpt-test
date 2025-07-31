@@ -1,0 +1,101 @@
+trigger:
+  branches:
+    include:
+    - main
+
+variables:
+  azureSubscription: 'azure-service-connection'
+  acrServiceConnection: 'acr-service-connection'
+  resourceGroup: 'myResourceGroup'
+  aksClusterName: 'myAKSCluster'
+  acrName: 'myacr'
+  dockerRepository: 'my-nginx-static-site'
+  namespace: 'default'
+  ACR_USERNAME: '$(acrName)' # ACR username is the ACR name
+  ACR_EMAIL: 'none'          # Email is not required but kubectl requires a value
+
+stages:
+- stage: Build
+  jobs:
+  - job: BuildImage
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: Docker@2
+      displayName: Build Docker Image
+      inputs:
+        command: build
+        Dockerfile: Dockerfile
+        repository: '$(acrName).azurecr.io/$(dockerRepository)'
+        tags: |
+          $(Build.BuildId)
+        containerRegistry: '$(acrServiceConnection)'
+
+- stage: Push
+  dependsOn: Build
+  jobs:
+  - job: PushImage
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: Docker@2
+      displayName: Push Docker Image
+      inputs:
+        command: push
+        repository: '$(acrName).azurecr.io/$(dockerRepository)'
+        tags: |
+          $(Build.BuildId)
+        containerRegistry: '$(acrServiceConnection)'
+
+- stage: Deploy
+  dependsOn: Push
+  jobs:
+  - job: DeployToAKS
+    pool:
+      vmImage: 'ubuntu-latest'
+    variables:
+      - group: 'ACR-Credentials'  # Variable group containing ACR_PASSWORD secret
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Azure Login'
+      inputs:
+        azureSubscription: '$(azureSubscription)'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          echo "Logged in to Azure"
+
+    - task: AzureCLI@2
+      displayName: 'Get AKS Credentials'
+      inputs:
+        azureSubscription: '$(azureSubscription)'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          az aks get-credentials --resource-group $(resourceGroup) --name $(aksClusterName) --overwrite-existing
+
+    - task: AzureCLI@2
+      displayName: 'Create Docker Registry Secret in AKS'
+      inputs:
+        azureSubscription: '$(azureSubscription)'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          # Delete existing secret if exists
+          kubectl delete secret acr-auth --namespace $(namespace) --ignore-not-found
+          # Create docker-registry secret for ACR in AKS
+          kubectl create secret docker-registry acr-auth \
+            --docker-server=$(acrName).azurecr.io \
+            --docker-username=$(ACR_USERNAME) \
+            --docker-password=$(ACR_PASSWORD) \
+            --docker-email=$(ACR_EMAIL) \
+            --namespace $(namespace)
+
+    - task: Kubernetes@1
+      displayName: Deploy to AKS
+      inputs:
+        connectionType: 'None'
+        namespace: '$(namespace)'
+        command: apply
+        useConfigurationFile: true
+        configuration: deployment.yaml,service.yaml
