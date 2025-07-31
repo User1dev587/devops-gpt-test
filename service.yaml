@@ -1,0 +1,15 @@
+# Kubernetes Service manifest to expose NGINX deployment via LoadBalancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-static-service
+  labels:
+    app.kubernetes.io/name: nginx-static-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx-static
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80

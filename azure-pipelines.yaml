@@ -1,0 +1,60 @@
+trigger:
+  branches:
+    include:
+    - main
+
+variables:
+  dockerRepository: mydockerhubusername/nginx-static-website
+  dockerImageTag: $(Build.BuildId)
+  resourceGroup: myResourceGroup
+  aksClusterName: myAKSCluster
+  dockerUsername: mydockerhubusername
+  dockerPassword: $(dockerhubPassword)
+
+stages:
+- stage: Build
+  displayName: Build Docker Image
+  jobs:
+  - job: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
+    - task: Docker@2
+      displayName: Build and Push Docker Image
+      inputs:
+        command: buildAndPush
+        repository: $(dockerRepository)
+        dockerfile: Dockerfile
+        tags: $(dockerImageTag)
+        containerRegistry: dockerhub-service-connection
+
+- stage: Deploy
+  displayName: Deploy to AKS
+  dependsOn: Build
+  jobs:
+  - job: Deploy
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: AzureCLI@2
+      displayName: Set kubectl context
+      inputs:
+        azureSubscription: azure-service-connection
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          az aks get-credentials --resource-group $(resourceGroup) --name $(aksClusterName) --overwrite-existing
+    - script: |
+        kubectl create secret docker-registry regcred \
+          --docker-server=https://index.docker.io/v1/ \
+          --docker-username=$(dockerUsername) \
+          --docker-password=$(dockerPassword) \
+          --dry-run=client -o yaml | kubectl apply -f -
+      displayName: Create Docker Registry Secret
+    - script: |
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
+        kubectl set image deployment/nginx-static-website nginx=$(dockerRepository):$(dockerImageTag)
+        kubectl rollout status deployment/nginx-static-website --timeout=120s
+      displayName: Deploy Kubernetes Manifests and Update Image
