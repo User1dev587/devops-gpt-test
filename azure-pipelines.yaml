@@ -6,10 +6,10 @@ trigger:
 variables:
   azureSubscription: 'azure-service-connection'
   acrServiceConnection: 'acr-service-connection'
-  resourceGroup: 'myResourceGroup'
-  aksClusterName: 'myAKSCluster'
-  acrName: 'myacr'
-  dockerRepository: 'my-nginx-static-site'
+  resourceGroup: 'terraform-aks'
+  aksClusterName: 'terra-aks'
+  acrName: 'terratamldacr'
+  dockerRepository: 'nginx-test'
   namespace: 'default'
   ACR_USERNAME: '$(acrName)' # ACR username is the ACR name
   ACR_EMAIL: 'none'          # Email is not required but kubectl requires a value

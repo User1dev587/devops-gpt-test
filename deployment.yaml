@@ -13,9 +13,11 @@ spec:
       labels:
         app: static-nginx
     spec:
+      imagePullSecrets:
+      - name: acr-auth
       containers:
       - name: nginx
-        image: myregistry.example.com/static-nginx:latest
+        image: terratamldacr.azurecr.io/nginx-test
         resources:
           requests:
             cpu: "1"
