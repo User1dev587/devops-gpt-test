@@ -1,0 +1,13 @@
+# COMMENT: Kubernetes service configuration to expose the NGINX deployment externally via LoadBalancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
