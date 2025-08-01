@@ -8,6 +8,7 @@ variables:
   AKSClusterName: 'terra-aks'
   ACR_URL: 'terratamldacr.azurecr.io'
   imageRepository: 'nginx-demo-test'
+  imageTag: '$(Build.BuildId)'
 
 stages:
 - stage: Build
