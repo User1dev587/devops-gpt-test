@@ -4,16 +4,14 @@ trigger:
       - main
 
 variables:
-  dockerRegistryServiceConnection: 'my-docker-registry-service-connection'
-  azureSubscription: 'my-azure-subscription'
-  azureResourceGroup: 'my-aks-resource-group'
-  aksCluster: 'my-aks-cluster'
-  containerRegistry: 'mycontainerregistry.azurecr.io'
-  dockerImageName: 'nginx-demo'
+  dockerRegistryServiceConnection: 'acr-connection'
+  azureSubscription: 'azure-service-connection'
+  azureResourceGroup: 'terraform-aks'
+  aksCluster: 'terra-aks'
+  containerRegistry: 'terratamldacr.azurecr.io'
+  dockerImageName: 'nginx-demo2'
   dockerImageTag: 'latest'
-  ACR_USERNAME: 'myACRUsername'
-  ACR_PASSWORD: 'myACRPassword'
-  ACR_EMAIL: 'myACREmail@domain.com'
+
 
 stages:
   - stage: Build
