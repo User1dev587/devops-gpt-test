@@ -14,9 +14,11 @@ spec:
       labels:
         app: nginx-demo
     spec:
+      imagePullSecrets:
+      - name: acr-secret
       containers:
         - name: nginx-demo
-          image: terratamldacr.azurecr.io/nginx-demo:latest
+          image: terratamldacr.azurecr.io/nginx-demo2:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
