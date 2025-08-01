@@ -29,7 +29,7 @@ stages:
         containerRegistry: '$(dockerRegistryServiceConnection)'
         repository: '$(ACR_URL)/$(imageRepository)'
         command: 'build'
-        Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+        Dockerfile: '$(Build.SourcesDirectory)/dockerfile'
         tags: |
           $(imageTag)
     - task: Docker@2
