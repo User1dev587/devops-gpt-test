@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: nginx-demo
-          image: nginx-demo:latest
+          image: terratamldacr.azurecr.io/nginx-demo:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
