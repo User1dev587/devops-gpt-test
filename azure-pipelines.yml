@@ -2,16 +2,12 @@ trigger:
 - main
 
 variables:
-  dockerRegistryServiceConnection: 'myACRServiceConnection'
-  azureSubscription: 'myAzureSubscription'
-  azureResourceGroup: 'myResourceGroup'
-  AKSClusterName: 'myAKSCluster'
-  ACR_URL: 'myacr.azurecr.io'
-  imageRepository: 'nginx-demo'
-  imageTag: 'latest'
-  ACR_USERNAME: '$(acrUsername)'
-  ACR_PASSWORD: '$(acrPassword)'
-  ACR_EMAIL: '$(acrEmail)'
+  dockerRegistryServiceConnection: 'acr-connection'
+  azureSubscription: 'azure-service-connection'
+  azureResourceGroup: 'terraform-aks'
+  AKSClusterName: 'terra-aks'
+  ACR_URL: 'terratamldacr.azurecr.io'
+  imageRepository: 'nginx-demo-test'
 
 stages:
 - stage: Build
@@ -78,8 +74,7 @@ stages:
           kubectl create secret docker-registry acr-secret \
             --docker-server=$(ACR_URL) \
             --docker-username=$(ACR_USERNAME) \
-            --docker-password=$(ACR_PASSWORD) \
-            --docker-email=$(ACR_EMAIL) \
+            --docker-password=$(ACR_PASSWORD) \\
             --namespace default || echo "Secret already exists"
     - task: Kubernetes@1
       displayName: "Deploy to AKS using kubectl"

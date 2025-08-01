@@ -14,11 +14,11 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: myacr.azurecr.io/nginx-demo:latest
+        image: terratamldacr.azurecr.io/nginx-demo-test
         ports:
         - containerPort: 80
       imagePullSecrets:
-      - name: acr-auth-secret
+      - name: acr-secret
 ---
 apiVersion: v1
 kind: Service
