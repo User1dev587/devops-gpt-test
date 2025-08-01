@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-demo
+  template:
+    metadata:
+      labels:
+        app: nginx-demo
+    spec:
+      containers:
+      - name: nginx
+        image: myacr.azurecr.io/nginx-demo:latest
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: acr-auth-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx-demo
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
